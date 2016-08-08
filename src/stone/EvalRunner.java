@@ -15,5 +15,7 @@ public class EvalRunner {
 		}
 
 		System.out.println("end");
+		System.exit(0);
+
 	}
 }

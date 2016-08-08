@@ -9,6 +9,6 @@ public class ExprParserRunner {
 		}
 
 		System.out.println("end");
-
+		System.exit(0);
 	}
 }

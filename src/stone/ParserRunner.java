@@ -10,6 +10,6 @@ public class ParserRunner {
 
 
 		System.out.println("end");
-
+		System.exit(0);
 	}
 }
