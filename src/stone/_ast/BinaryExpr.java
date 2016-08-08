@@ -2,6 +2,9 @@ package stone._ast;
 
 import java.util.List;
 
+import stone.Environment;
+import stone.StoneException;
+import stone.ast.ASTLeaf;
 import stone.ast.ASTList;
 import stone.ast.ASTree;
 
@@ -28,5 +31,67 @@ public class BinaryExpr extends ASTList {
 
 	public ASTree right() {
 		return child(2);
+	}
+
+	public Object eval(Environment env) {
+		String op = ((ASTLeaf) operator()).token().getText();
+		if (op.equals("=")) {
+			return computeAssign(env, left(), right());
+		}
+
+		Object left = left().eval(env);
+		Object right = right().eval(env);
+
+		if (left instanceof Integer && right instanceof Integer) {
+			return computeNumber(op, (int) left, (int) right);
+		} else {
+			throw new StoneException(String.format("cannot compute %s %s %s",
+					left, op, right), this);
+		}
+	}
+
+	private Object computeNumber(String op, int left, int right) {
+
+		switch (op) {
+		case "+":
+			return left + right;
+
+		case "-":
+			return left - right;
+
+		case "*":
+			return left * right;
+
+		case "/":
+			return left / right;
+
+		case ">":
+			return left > right;
+
+		case "<":
+			return left < right;
+
+		case ">=":
+			return left >= right;
+
+		case "<=":
+			return left <= right;
+
+		case "==":
+			return left == right;
+
+		default:
+			throw new StoneException("uncomputable binary operator " + op, this);
+		}
+
+	}
+
+	private Object computeAssign(Environment env, ASTree lhs, ASTree rhs) {
+		
+		if(!(lhs instanceof Name)){
+			throw new StoneException("left handle side of assign operator must be L-Value but " + lhs, this);
+		}
+		
+		return env.put(((Name)lhs).name(), rhs.eval(env));
 	}
 }

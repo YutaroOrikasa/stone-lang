@@ -5,7 +5,7 @@ import java.util.Iterator;
 
 import stone.Token;
 
-public class ASTLeaf extends ASTree{
+public abstract class ASTLeaf extends ASTree{
 
 	private static ArrayList<ASTree> empty = new ArrayList<>();
 	protected Token token;

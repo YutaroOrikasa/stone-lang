@@ -4,7 +4,9 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-public class ASTList extends ASTree {
+import stone.Environment;
+
+public abstract class ASTList extends ASTree {
 
 	protected List<ASTree> children;
 
@@ -58,4 +60,5 @@ public class ASTList extends ASTree {
 		}
 		return null;
 	}
+	
 }
