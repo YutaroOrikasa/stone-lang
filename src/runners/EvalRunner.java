@@ -16,7 +16,7 @@ public class EvalRunner {
 			ASTree t = parser.program();
 			System.out.println(t);
 			System.out.println("eval: " + t.eval(env));
-			;
+
 		}
 
 		System.out.println("end");
