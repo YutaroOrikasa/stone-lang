@@ -1,4 +1,8 @@
-package stone;
+package runners;
+
+import stone.Lexer;
+import stone.ParseException;
+import stone.Token;
 
 public class LexerRunner {
 	

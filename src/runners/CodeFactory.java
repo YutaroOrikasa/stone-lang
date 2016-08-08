@@ -1,4 +1,4 @@
-package stone;
+package runners;
 
 import java.awt.Panel;
 import java.io.Reader;

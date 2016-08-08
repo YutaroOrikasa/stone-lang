@@ -1,4 +1,9 @@
-package stone;
+package runners;
+
+import stone.Lexer;
+import stone.ParseException;
+import stone.Parser;
+import stone.Token;
 
 public class ParserRunner {
 	public static void main(String[] args) throws ParseException {

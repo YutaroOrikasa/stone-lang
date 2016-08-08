@@ -1,5 +1,10 @@
-package stone;
+package runners;
 
+import stone.BasicEnvironment;
+import stone.Lexer;
+import stone.ParseException;
+import stone.Parser;
+import stone.Token;
 import stone.ast.ASTree;
 
 public class EvalRunner {
