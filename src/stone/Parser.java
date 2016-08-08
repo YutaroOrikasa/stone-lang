@@ -5,11 +5,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
 import stone._ast.BinaryExpr;
+import stone._ast.BlockStatement;
 import stone._ast.IfStatement;
+import stone._ast.Name;
+import stone._ast.NumberLiteral;
+import stone._ast.StringLiteral;
 import stone._ast.UnaryExpr;
 import stone._ast.WhileStatement;
 import stone.ast.ASTLeaf;
@@ -41,7 +46,7 @@ public class Parser {
 	/*
 	 * 操車場アルゴリズムで使う。 スタックの底にある $ を意味する。
 	 */
-	private static ASTree dollar = new ASTLeaf(new Token(0));
+	private static ASTree dollar = new Operator(null);
 
 	Lexer lexer;
 
@@ -50,12 +55,15 @@ public class Parser {
 	}
 
 	public ASTree program() throws ParseException {
-		if (isToken(";") || isToken(Token.EOL)) {
-			return new ASTLeaf(lexer.read());
+		while (isToken(";") || isToken(Token.EOL)) {
+			eat();
 		}
 
 		ASTree s = statement();
-
+		
+		if (isToken(";") || isToken(Token.EOL)) {
+			eat();
+		}
 		return s;
 
 	}
@@ -116,7 +124,7 @@ public class Parser {
 			statements.add(statement());
 		}
 
-		return new ASTList(statements);
+		return new BlockStatement(statements);
 
 	}
 
@@ -209,7 +217,7 @@ public class Parser {
 		stack.addLast(factor());
 
 		while (isOperator()) {
-			stack.addLast(new ASTLeaf(eat()));
+			stack.addLast(new Operator(eat()));
 			stack.addLast(factor());
 		}
 
@@ -253,7 +261,7 @@ public class Parser {
 
 	public ASTree factor() throws ParseException {
 		if (isToken("-")) {
-			return new UnaryExpr(new ASTLeaf(lexer.read()), primary());
+			return new UnaryExpr(new Operator(lexer.read()), primary());
 		} else {
 			return primary();
 		}
@@ -280,13 +288,19 @@ public class Parser {
 
 		} else {
 			Token t = lexer.read();
-			if (!(t.isIdentifer() || t.isNumber() || t.isString())) {
+
+			if (t.isIdentifer()) {
+				return new Name(t);
+			} else if (t.isNumber()) {
+				return new NumberLiteral(t);
+			} else if (t.isString()) {
+				return new StringLiteral(t);
+			} else {
+
 				throw new ParseException(String.format(Locale.US,
 						"eligal token '%s' at line %d", t.getText(),
 						t.getLineNumber()));
 			}
-
-			return new ASTLeaf(t);
 
 		}
 	}
@@ -308,6 +322,19 @@ public class Parser {
 
 	private Token eat() throws ParseException {
 		return lexer.read();
+	}
+
+	private static class Operator extends ASTLeaf {
+
+		public Operator(Token t) {
+			super(t);
+		}
+
+		@Override
+		public Object eval(Environment env) {
+			throw new RuntimeException("not implemented! never call eval()!");
+		}
+
 	}
 
 }
