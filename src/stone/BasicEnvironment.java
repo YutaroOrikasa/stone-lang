@@ -2,19 +2,15 @@ package stone;
 
 import java.util.HashMap;
 
-public class BasicEnvironment extends HashMap<String, Object> implements Environment {
+public class BasicEnvironment implements Environment {
+	HashMap<String, Object> table = new HashMap<>();
 
-	@Override
 	public Object get(String name) {
-		return super.get(name);
+		return table.get(name);
 	}
 
-//	private HashMap<String, Object> table = new HashMap<>();
-//	
-//	public void put(String name, Object value){
-//		table.put;
-//	}
-//	public Object get(String name);
-	
+	public void put(String name, Object value) {
+		table.put(name, value);
+	}
 
 }

@@ -91,7 +91,7 @@ public class BinaryExpr extends ASTList {
 		if(!(lhs instanceof Name)){
 			throw new StoneException("left handle side of assign operator must be L-Value but " + lhs, this);
 		}
-		
-		return env.put(((Name)lhs).name(), rhs.eval(env));
+		env.put(((Name)lhs).name(), rhs.eval(env));
+		return lhs.eval(env);
 	}
 }
