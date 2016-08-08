@@ -89,7 +89,7 @@ public class BinaryExpr extends ASTList {
 	private Object computeAssign(Environment env, ASTree lhs, ASTree rhs) {
 		
 		if(!(lhs instanceof Name)){
-			throw new StoneException("left handle side of assign operator must be L-Value but " + lhs, this);
+			throw new StoneException("left hand side of assign operator must be L-Value but " + lhs, this);
 		}
 		env.put(((Name)lhs).name(), rhs.eval(env));
 		return lhs.eval(env);
