@@ -55,7 +55,8 @@ public class Parser {
 
 	public ASTree program() throws ParseException {
 		if (isToken(";") || isToken(Token.EOL)) {
-			eat();
+
+			return new NullStatement(eat());
 		}
 
 		ASTree s = statement();
@@ -65,6 +66,19 @@ public class Parser {
 		}
 		return s;
 
+	}
+	
+	public static class NullStatement extends ASTLeaf {
+
+		public NullStatement(Token t) {
+			super(t);
+		}
+
+		@Override
+		public Object eval(Environment env) {
+			return null;
+		}
+		
 	}
 
 	public ASTree statement() throws ParseException {
