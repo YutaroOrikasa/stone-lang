@@ -67,6 +67,19 @@ public class Parser {
 		return s;
 
 	}
+	
+	public static class NullStatement extends ASTLeaf {
+
+		public NullStatement(Token t) {
+			super(t);
+		}
+
+		@Override
+		public Object eval(Environment env) {
+			return null;
+		}
+		
+	}
 
 	public ASTree statement() throws ParseException {
 
