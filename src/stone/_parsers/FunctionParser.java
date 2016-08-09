@@ -49,8 +49,6 @@ public class FunctionParser extends Parser {
 		private ASTree paramaters;
 		private ASTree body;
 
-
-
 		protected ASTree paramaters() {
 			return paramaters;
 		}
@@ -67,7 +65,7 @@ public class FunctionParser extends Parser {
 			} else {
 				this.name = null;
 			}
-			
+
 			this.paramaters = paramater;
 			this.body = body;
 		}
@@ -75,15 +73,15 @@ public class FunctionParser extends Parser {
 		@Override
 		public Object eval(Environment env) {
 			Object funcObject = new Function(env, this);
-			if(name!=null){
-			env.put(name, funcObject);
+			if (name != null) {
+				env.put(name, funcObject);
 			}
 			return funcObject;
 		}
 
 		public Object call(Environment env, Object[] args) {
 			if (paramaters().numChildren() != args.length) {
-				throw new StoneException("bad number of arguments", this);
+				throw new IllegalArgumentException("bad number of arguments");
 			}
 			Environment nestedEnv = new NestedEnvironment(env);
 
@@ -98,14 +96,18 @@ public class FunctionParser extends Parser {
 
 		@Override
 		public String toString() {
-			
-			if(name!=null){
 
-			return String
-					.format("(def %s %s %s)", name, paramaters(), body());
-			}else {
+			if (name != null) {
+
+				return String.format("(def %s %s %s)", name, paramaters(),
+						body());
+			} else {
 				return String.format("(fun %s %s)", paramaters(), body());
 			}
+		}
+
+		public int numOfParameters() {
+			return paramaters().numChildren();
 		}
 	}
 
@@ -144,6 +146,10 @@ public class FunctionParser extends Parser {
 		public Function(Environment env, Fun def) {
 			this.env = env;
 			defStatement = def;
+		}
+
+		public int numOfParameters() {
+			return defStatement.numOfParameters();
 		}
 
 		public Object call(Object[] args) {
@@ -242,13 +248,17 @@ public class FunctionParser extends Parser {
 						+ funcObject.getClass().getCanonicalName()
 						+ "is not callable", this);
 			}
+			Function func = (Function)funcObject;
+			if (func.numOfParameters() != args().numChildren()) {
+				throw new StoneException("bad number of arguments", this);
+			}
 			Object[] args = new Object[args().numChildren()];
 
 			for (int i = 0; i < args.length; i++) {
 				args[i] = args().child(i).eval(env);
 			}
 
-			return ((Function) funcObject).call(args);
+			return func.call(args);
 		}
 	}
 
