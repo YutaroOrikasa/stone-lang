@@ -12,6 +12,7 @@ import stone.Parser;
 import stone.StoneException;
 import stone.Token;
 import stone._ast.Name;
+import stone._types.Callable;
 import stone.ast.ASTList;
 import stone.ast.ASTree;
 
@@ -139,7 +140,7 @@ public class FunctionParser extends Parser {
 
 	}
 
-	private static class Function {
+	private static class Function implements Callable {
 		private Environment env;
 		private Fun defStatement;
 
@@ -243,12 +244,12 @@ public class FunctionParser extends Parser {
 		@Override
 		public Object eval(Environment env) {
 			Object funcObject = child(0).eval(env);
-			if (!(funcObject instanceof Function)) {
+			if (!(funcObject instanceof Callable)) {
 				throw new StoneException(""
 						+ funcObject.getClass().getCanonicalName()
 						+ "is not callable", this);
 			}
-			Function func = (Function)funcObject;
+			Callable func = (Callable)funcObject;
 			if (func.numOfParameters() != args().numChildren()) {
 				throw new StoneException("bad number of arguments", this);
 			}
