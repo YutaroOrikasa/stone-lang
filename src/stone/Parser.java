@@ -55,8 +55,8 @@ public class Parser {
 	}
 
 	public ASTree program() throws ParseException {
-		while (isToken(";") || isToken(Token.EOL)) {
-			eat();
+		if (isToken(";") || isToken(Token.EOL)) {
+			return new NullStatement(eat());
 		}
 
 		ASTree s = statement();
