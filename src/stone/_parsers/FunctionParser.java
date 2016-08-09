@@ -46,11 +46,11 @@ public class FunctionParser extends Parser {
 	private static class Fun extends ASTList {
 
 		private String name;
-		private ASTree paramaters;
+		private ASTree parameters;
 		private ASTree body;
 
-		protected ASTree paramaters() {
-			return paramaters;
+		protected ASTree parameters() {
+			return parameters;
 		}
 
 		protected ASTree body() {
@@ -66,7 +66,7 @@ public class FunctionParser extends Parser {
 				this.name = null;
 			}
 
-			this.paramaters = paramater;
+			this.parameters = paramater;
 			this.body = body;
 		}
 
@@ -80,14 +80,14 @@ public class FunctionParser extends Parser {
 		}
 
 		public Object call(Environment env, Object[] args) {
-			if (paramaters().numChildren() != args.length) {
+			if (parameters().numChildren() != args.length) {
 				throw new IllegalArgumentException("bad number of arguments");
 			}
 			Environment nestedEnv = new NestedEnvironment(env);
 
-			for (int i = 0; i < paramaters().numChildren(); i++) {
+			for (int i = 0; i < parameters().numChildren(); i++) {
 
-				String name = ((Name) paramaters().child(i)).name();
+				String name = ((Name) parameters().child(i)).name();
 				nestedEnv.put(name, args[i]);
 			}
 			return body().eval(nestedEnv);
@@ -99,15 +99,15 @@ public class FunctionParser extends Parser {
 
 			if (name != null) {
 
-				return String.format("(def %s %s %s)", name, paramaters(),
+				return String.format("(def %s %s %s)", name, parameters(),
 						body());
 			} else {
-				return String.format("(fun %s %s)", paramaters(), body());
+				return String.format("(fun %s %s)", parameters(), body());
 			}
 		}
 
 		public int numOfParameters() {
-			return paramaters().numChildren();
+			return parameters().numChildren();
 		}
 	}
 
