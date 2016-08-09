@@ -29,7 +29,7 @@ public class FunctionParser extends Parser {
 	 */
 	public ASTree defStatement() throws ParseException {
 		eat("def");
-		return new DefStatement(eatName(), paramList(), block());
+		return new Fun(eatName(), paramList(), block());
 
 	}
 
@@ -39,19 +39,17 @@ public class FunctionParser extends Parser {
 	public ASTree closure() throws ParseException {
 		Token t = eat("fun");
 
-		return new Closure(paramList(), block());
+		return new Fun(null, paramList(), block());
 
 	}
 
-	private static class DefStatement extends ASTList {
+	private static class Fun extends ASTList {
 
 		private String name;
 		private ASTree paramaters;
 		private ASTree body;
 
-		protected String name() {
-			return name;
-		}
+
 
 		protected ASTree paramaters() {
 			return paramaters;
@@ -61,9 +59,15 @@ public class FunctionParser extends Parser {
 			return body;
 		}
 
-		public DefStatement(Name name, ASTree paramater, ASTree body) {
+		public Fun(Name name, ASTree paramater, ASTree body) {
 			super(name, paramater, body);
-			this.name = name.name();
+
+			if (name != null) {
+				this.name = name.name();
+			} else {
+				this.name = null;
+			}
+			
 			this.paramaters = paramater;
 			this.body = body;
 		}
@@ -71,7 +75,9 @@ public class FunctionParser extends Parser {
 		@Override
 		public Object eval(Environment env) {
 			Object funcObject = new Function(env, this);
-			env.put(name(), funcObject);
+			if(name!=null){
+			env.put(name, funcObject);
+			}
 			return funcObject;
 		}
 
@@ -92,36 +98,15 @@ public class FunctionParser extends Parser {
 
 		@Override
 		public String toString() {
+			
+			if(name!=null){
 
 			return String
-					.format("(def %s %s %s)", name(), paramaters(), body());
+					.format("(def %s %s %s)", name, paramaters(), body());
+			}else {
+				return String.format("(fun %s %s)", paramaters(), body());
+			}
 		}
-	}
-
-	private static class Closure extends DefStatement {
-
-
-		public Closure(final ASTree paramater, ASTree body) {
-			super(new Name(new Token(0){
-				@Override
-				public String getText() {
-					return "<anonymous>";
-				}
-			}){
-				@Override
-				public String location() {
-					return paramater.location();
-				}
-				
-			}, paramater, body);
-
-		}
-
-		@Override
-		public String toString() {
-			return String.format("(fun %s %s)", paramaters(), body());
-		}
-
 	}
 
 	private static class NestedEnvironment implements Environment {
@@ -154,9 +139,9 @@ public class FunctionParser extends Parser {
 
 	private static class Function {
 		private Environment env;
-		private DefStatement defStatement;
+		private Fun defStatement;
 
-		public Function(Environment env, DefStatement def) {
+		public Function(Environment env, Fun def) {
 			this.env = env;
 			defStatement = def;
 		}
