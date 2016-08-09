@@ -4,7 +4,7 @@ import java.util.Iterator;
 
 import stone.Environment;
 
-public abstract class ASTree {
+public abstract class ASTree implements Iterable<ASTree>{
 	
 	public abstract ASTree child(int i);
 	public abstract int numChildren();
