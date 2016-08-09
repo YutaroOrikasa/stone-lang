@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -17,8 +16,8 @@ import stone._ast.NumberLiteral;
 import stone._ast.StringLiteral;
 import stone._ast.UnaryExpr;
 import stone._ast.WhileStatement;
+import stone._parsers.FunctionParser;
 import stone.ast.ASTLeaf;
-import stone.ast.ASTList;
 import stone.ast.ASTree;
 
 public class Parser {
@@ -55,12 +54,12 @@ public class Parser {
 	}
 
 	public ASTree program() throws ParseException {
-		while (isToken(";") || isToken(Token.EOL)) {
+		if (isToken(";") || isToken(Token.EOL)) {
 			eat();
 		}
 
 		ASTree s = statement();
-		
+
 		if (isToken(";") || isToken(Token.EOL)) {
 			eat();
 		}
@@ -74,11 +73,15 @@ public class Parser {
 			return ifStatement();
 		} else if (isToken("while")) {
 			return whileStatement();
+		} else if (isToken("def")) {
+			return new FunctionParser(lexer).defStatement();
 		} else {
 			return simple();
 		}
 
 	}
+
+
 
 	public ASTree ifStatement() throws ParseException {
 		// eat "if"
@@ -267,9 +270,27 @@ public class Parser {
 		}
 	}
 
+	/*
+	 * primary ::= closure | primary0 ( postfix )*
+	 */
 	public ASTree primary() throws ParseException {
-		if (isToken("(")) {
+		if(isToken("fun")){
+			return new FunctionParser(lexer).closure();
+		}
+		ASTree p0 = primary0();
+		ASTree funcCallChain = new FunctionParser(lexer).funcCallChain(p0);
+		return funcCallChain;
+	}
 
+
+
+
+
+	/*
+	 * ( '(' expr ')' | number | string | identifier )
+	 */
+	private ASTree primary0() throws ParseException {
+		if (isToken("(")) {
 			// eat "("
 			lexer.read();
 
@@ -305,24 +326,7 @@ public class Parser {
 		}
 	}
 
-	private boolean isToken(String s) throws ParseException {
-		return lexer.lookAhead1().getText().equals(s);
 
-	}
-
-	private Token eat(String s) throws ParseException {
-		if (!isToken(s)) {
-			Token t = lexer.read();
-			throw new ParseException(String.format(Locale.US,
-					"must come '%s' but '%s' came at line %d", s, t.getText(),
-					t.getLineNumber()));
-		}
-		return eat();
-	}
-
-	private Token eat() throws ParseException {
-		return lexer.read();
-	}
 
 	private static class Operator extends ASTLeaf {
 
@@ -332,9 +336,28 @@ public class Parser {
 
 		@Override
 		public Object eval(Environment env) {
-			throw new RuntimeException("not implemented! never call eval()!");
+			throw new RuntimeException(
+					"this node cannot be evaluated! never call eval()!");
 		}
 
 	}
+	protected Token eat(String s) throws ParseException {
+		if (!isToken(s)) {
+			Token t = lexer.read();
+			throw new ParseException(String.format(Locale.US,
+					"must come '%s' but '%s' came at line %d", s, t.getText(),
+					t.getLineNumber()));
+		}
+		return eat();
+	}
 
+	protected Token eat() throws ParseException {
+		return lexer.read();
+	}
+	
+
+	protected boolean isToken(String s) throws ParseException {
+		return lexer.lookAhead1().getText().equals(s);
+
+	}
 }
