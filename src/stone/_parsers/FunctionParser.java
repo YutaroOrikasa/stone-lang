@@ -39,8 +39,7 @@ public class FunctionParser extends Parser {
 	public ASTree closure() throws ParseException {
 		Token t = eat("fun");
 
-		return new DefStatement(new Name(new Token(t.getLineNumber())),
-				paramList(), block());
+		return new Closure(paramList(), block());
 
 	}
 
@@ -49,6 +48,18 @@ public class FunctionParser extends Parser {
 		private String name;
 		private ASTree paramaters;
 		private ASTree body;
+
+		protected String name() {
+			return name;
+		}
+
+		protected ASTree paramaters() {
+			return paramaters;
+		}
+
+		protected ASTree body() {
+			return body;
+		}
 
 		public DefStatement(Name name, ASTree paramater, ASTree body) {
 			super(name, paramater, body);
@@ -60,30 +71,57 @@ public class FunctionParser extends Parser {
 		@Override
 		public Object eval(Environment env) {
 			Object funcObject = new Function(env, this);
-			env.put(name, funcObject);
+			env.put(name(), funcObject);
 			return funcObject;
 		}
 
 		public Object call(Environment env, Object[] args) {
-			if (paramaters.numChildren() != args.length) {
+			if (paramaters().numChildren() != args.length) {
 				throw new StoneException("bad number of arguments", this);
 			}
 			Environment nestedEnv = new NestedEnvironment(env);
 
-			for (int i = 0; i < paramaters.numChildren(); i++) {
+			for (int i = 0; i < paramaters().numChildren(); i++) {
 
-				String name = ((Name) paramaters.child(i)).name();
+				String name = ((Name) paramaters().child(i)).name();
 				nestedEnv.put(name, args[i]);
 			}
-			return body.eval(nestedEnv);
+			return body().eval(nestedEnv);
 
 		}
 
 		@Override
 		public String toString() {
 
-			return String.format("(def %s %s %s)", name, paramaters, body);
+			return String
+					.format("(def %s %s %s)", name(), paramaters(), body());
 		}
+	}
+
+	private static class Closure extends DefStatement {
+
+
+		public Closure(final ASTree paramater, ASTree body) {
+			super(new Name(new Token(0){
+				@Override
+				public String getText() {
+					return "<anonymous>";
+				}
+			}){
+				@Override
+				public String location() {
+					return paramater.location();
+				}
+				
+			}, paramater, body);
+
+		}
+
+		@Override
+		public String toString() {
+			return String.format("(fun %s %s)", paramaters(), body());
+		}
+
 	}
 
 	private static class NestedEnvironment implements Environment {
