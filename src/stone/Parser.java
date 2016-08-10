@@ -67,7 +67,7 @@ public class Parser {
 		return s;
 
 	}
-	
+
 	public static class NullStatement extends ASTLeaf {
 
 		public NullStatement(Token t) {
@@ -78,7 +78,7 @@ public class Parser {
 		public Object eval(Environment env) {
 			return null;
 		}
-		
+
 	}
 
 	public ASTree statement() throws ParseException {
@@ -94,8 +94,6 @@ public class Parser {
 		}
 
 	}
-
-
 
 	public ASTree ifStatement() throws ParseException {
 		// eat "if"
@@ -288,17 +286,30 @@ public class Parser {
 	 * primary ::= closure | primary0 ( postfix )*
 	 */
 	public ASTree primary() throws ParseException {
-		if(isToken("fun")){
+		if (isToken("fun")) {
 			return new FunctionParser(lexer).closure();
 		}
 		ASTree p0 = primary0();
-		ASTree funcCallChain = new FunctionParser(lexer).funcCallChain(p0);
-		return funcCallChain;
+		return foldlPostfixes(p0);
 	}
 
-
-
-
+	/**
+	 * left folding postfixes parser
+	 * 
+	 * @param primary
+	 * @return (((primary postfix1) postfix2 ... ) postfixN)
+	 * @throws ParseException
+	 */
+	private ASTree foldlPostfixes(ASTree primary) throws ParseException {
+		for (;;) {
+			if (isToken("(")) {
+				primary = new FunctionParser(lexer).callExpression(primary);
+			} else {
+				break;
+			}
+		}
+		return primary;
+	}
 
 	/*
 	 * ( '(' expr ')' | number | string | identifier )
@@ -340,8 +351,6 @@ public class Parser {
 		}
 	}
 
-
-
 	private static class Operator extends ASTLeaf {
 
 		public Operator(Token t) {
@@ -355,6 +364,7 @@ public class Parser {
 		}
 
 	}
+
 	protected Token eat(String s) throws ParseException {
 		if (!isToken(s)) {
 			Token t = lexer.read();
@@ -368,7 +378,6 @@ public class Parser {
 	protected Token eat() throws ParseException {
 		return lexer.read();
 	}
-	
 
 	protected boolean isToken(String s) throws ParseException {
 		return lexer.lookAhead1().getText().equals(s);

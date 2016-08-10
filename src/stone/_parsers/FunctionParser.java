@@ -26,26 +26,22 @@ public class FunctionParser extends Parser {
 	}
 
 	/**
-	 * @return ( primary0 ( '(' args? ')' )* )
+	 * 
+	 * @param primary
+	 * @return (primary '(' args? ')' )
+	 * @throws ParseException
 	 */
-	public ASTree funcCallChain(ASTree primary0) throws ParseException {
-		ASTree expr = primary0;
-		for (;;) {
-			if (isToken("(")) {
-				eat("(");
-				if (isToken(")")) {
-					expr = new FuncCallExpr(expr, new FakeASTList());
-				} else {
-					ASTList args = args();
-					expr = new FuncCallExpr(expr, args);
-				}
-				eat(")");
-
-			} else {
-				return expr;
-
-			}
+	public ASTree callExpression(ASTree primary) throws ParseException {
+		eat("(");
+		if (isToken(")")) {
+			primary = new FuncCallExpr(primary, new FakeASTList());
+		} else {
+			ASTList args = args();
+			primary = new FuncCallExpr(primary, args);
 		}
+		eat(")");
+
+		return primary;
 	}
 
 	/*
@@ -249,7 +245,7 @@ public class FunctionParser extends Parser {
 						+ funcObject.getClass().getCanonicalName()
 						+ "is not callable", this);
 			}
-			Callable func = (Callable)funcObject;
+			Callable func = (Callable) funcObject;
 			if (func.numOfParameters() != args().numChildren()) {
 				throw new StoneException("bad number of arguments", this);
 			}
