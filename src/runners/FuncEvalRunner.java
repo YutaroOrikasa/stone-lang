@@ -1,6 +1,7 @@
 package runners;
 
 import stone.BasicEnvironment;
+import stone.CodeFactory;
 import stone.Lexer;
 import stone.ParseException;
 import stone.Parser;
