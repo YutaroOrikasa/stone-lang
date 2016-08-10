@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 public class Lexer {
 
-	public static String regexPat = "\\s*((//.*)|([0-9]+)|(\"(\\\\\"|\\\\\\\\|\\\\n|[^\"])*\")"
+	public static String regexPat = "\\s*((//.*)|([0-9]+)|\"((\\\\\"|\\\\\\\\|\\\\n|[^\"])*)\""
 			+ "|[A-Z_a-z][A-Z_a-z0-9]*|==|<=|>=|&&|\\|\\||\\p{Punct})?";
 
 	private static final Pattern pattern = Pattern.compile(regexPat);
@@ -145,7 +145,7 @@ public class Lexer {
 		if (matcher.group(3) != null) {
 			return new NumToken(linenum, Integer.parseInt(m));
 		} else if (matcher.group(4) != null) {
-			return new StrToken(linenum, m);
+			return new StrToken(linenum, matcher.group(4));
 		} else {
 			return new IdToken(linenum, m);
 		}
