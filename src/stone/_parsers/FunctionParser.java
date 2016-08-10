@@ -25,6 +25,29 @@ public class FunctionParser extends Parser {
 
 	}
 
+	/**
+	 * @return ( primary0 ( '(' args? ')' )* )
+	 */
+	public ASTree funcCallChain(ASTree primary0) throws ParseException {
+		ASTree expr = primary0;
+		for (;;) {
+			if (isToken("(")) {
+				eat("(");
+				if (isToken(")")) {
+					expr = new FuncCallExpr(expr, new FakeASTList());
+				} else {
+					ASTList args = args();
+					expr = new FuncCallExpr(expr, args);
+				}
+				eat(")");
+
+			} else {
+				return expr;
+
+			}
+		}
+	}
+
 	/*
 	 * def ::= 'def' Identifier paramList block
 	 */
@@ -206,29 +229,6 @@ public class FunctionParser extends Parser {
 			invalidToken(t);
 		}
 		return new Name(t);
-	}
-
-	/**
-	 * @return ( primary0 ( '(' args? ')' )* )
-	 */
-	public ASTree funcCallChain(ASTree primary0) throws ParseException {
-		ASTree expr = primary0;
-		for (;;) {
-			if (isToken("(")) {
-				eat("(");
-				if (isToken(")")) {
-					expr = new FuncCallExpr(expr, new FakeASTList());
-				} else {
-					ASTList args = args();
-					expr = new FuncCallExpr(expr, args);
-				}
-				eat(")");
-
-			} else {
-				return expr;
-
-			}
-		}
 	}
 
 	static private class FuncCallExpr extends ASTList {
