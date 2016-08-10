@@ -15,17 +15,20 @@ public class Interpreter {
 		System.exit(0);
 	}
 
-	public static void run(Reader r) throws ParseException {
+	public static Object run(Reader r) throws ParseException {
 		Lexer lexer = new Lexer(r);
 		Parser parser = new Parser(lexer);
 		BasicEnvironment env = new BasicEnvironment();
 		BuiltinFunctions.appendBuitlins(env);
+		Object eval = null;
 		while (lexer.lookAhead1() != Token.EOF) {
 			ASTree t = parser.program();
 			System.out.println(t);
-			System.out.println("eval: " + t.eval(env));
+			eval =t.eval(env);
+			System.out.println("eval: " + eval);
 
 		}
+		return eval;
 	}
 
 }
