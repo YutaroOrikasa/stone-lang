@@ -217,16 +217,19 @@ public class FunctionParser extends Parser {
 						+ "is not callable", this);
 			}
 			Callable func = (Callable) funcObject;
-			if (func.numOfParameters() != args().numChildren()) {
-				throw new StoneException("bad number of arguments", this);
-			}
+
 			Object[] args = new Object[args().numChildren()];
 
 			for (int i = 0; i < args.length; i++) {
 				args[i] = args().child(i).eval(env);
 			}
 
-			return func.call(args);
+			try {
+				return func.call(args);
+			} catch (Exception e) {
+				throw new StoneException("" + e, this);
+			}
+
 		}
 	}
 
