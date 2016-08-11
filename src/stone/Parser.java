@@ -186,6 +186,20 @@ public class Parser {
 
 	}
 
+	protected Name identifier() throws ParseException {
+
+		Token name = eat();
+
+		if (!name.isIdentifer()) {
+			throw new ParseException(
+					String.format(
+							Locale.US,
+							"Idenfier must be come after '.' but  '%s' came at line %d",
+							name.getText(), name.getLineNumber()));
+		}
+		return new Name(name);
+	}
+
 	/*
 	 * 後置記法のリストからASTを作る
 	 */
