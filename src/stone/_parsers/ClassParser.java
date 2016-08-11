@@ -60,9 +60,9 @@ public class ClassParser extends Parser {
 							+ " is not class name", this);
 				}
 
-				cls = new StoneClass(this, (StoneClass) superClassObject);
+				cls = new StoneClass(env, this, (StoneClass) superClassObject);
 			} else {
-				cls = new StoneClass(this);
+				cls = new StoneClass(env, this);
 
 			}
 			env.put(name(), cls);
@@ -80,11 +80,13 @@ public class ClassParser extends Parser {
 		}
 
 		public Environment initializeFields(Environment env,
-				StoneClass superClass) {
+				StoneClass superClass, Environment outer) {
 			if (superClass != null) {
 				superClass.initializeFields(env);
 			}
-			classBody.eval(env);
+
+			NestedEnvironment nested = new NestedEnvironment(outer, env);
+			classBody.eval(nested);
 			return env;
 		}
 
@@ -96,17 +98,19 @@ public class ClassParser extends Parser {
 
 	private static class StoneClass extends StoneObject {
 
+		private Environment env;
 		private ClassStatement classDef;
 		private StoneClass superClass = null;
 
-		public StoneClass(ClassStatement def) {
-
+		public StoneClass(Environment env, ClassStatement def) {
+			this.env = env;
 			classDef = def;
 			setField("new", new Constructor());
 		}
 
-		public StoneClass(ClassStatement def, StoneClass superClass) {
-			this(def);
+		public StoneClass(Environment env, ClassStatement def,
+				StoneClass superClass) {
+			this(env, def);
 			this.superClass = superClass;
 		}
 
@@ -120,7 +124,7 @@ public class ClassParser extends Parser {
 
 		private Environment initializeFields(Environment env) {
 
-			return classDef.initializeFields(env, superClass);
+			return classDef.initializeFields(env, superClass, this.env);
 		}
 
 		private class Constructor implements Callable {
