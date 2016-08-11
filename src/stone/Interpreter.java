@@ -2,11 +2,12 @@ package stone;
 
 import java.io.Reader;
 
+import stone.Parser.NullStatement;
 import stone.ast.ASTree;
 
 public class Interpreter {
 	public static void main(String[] args) throws ParseException {
-		
+
 		try {
 			run(CodeFactory.getReaderFromDialog());
 		} catch (Exception e) {
@@ -23,8 +24,11 @@ public class Interpreter {
 		Object eval = null;
 		while (lexer.lookAhead1() != Token.EOF) {
 			ASTree t = parser.program();
-			System.out.println(t);
-			eval =t.eval(env);
+			if (!(t instanceof NullStatement)) {
+				System.out.println(t);
+				eval = t.eval(env);
+			}
+
 			System.out.println("eval: " + eval);
 
 		}
