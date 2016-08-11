@@ -16,6 +16,8 @@ import stone._ast.NumberLiteral;
 import stone._ast.StringLiteral;
 import stone._ast.UnaryExpr;
 import stone._ast.WhileStatement;
+import stone._parsers.ClassParser;
+import stone._parsers.DotParser;
 import stone._parsers.FunctionParser;
 import stone.ast.ASTLeaf;
 import stone.ast.ASTree;
@@ -89,6 +91,8 @@ public class Parser {
 			return whileStatement();
 		} else if (isToken("def")) {
 			return new FunctionParser(lexer).defStatement();
+		} else if (isToken("class")) {
+			return new ClassParser(lexer).classStatement();
 		} else {
 			return simple();
 		}
@@ -318,6 +322,8 @@ public class Parser {
 		for (;;) {
 			if (isToken("(")) {
 				primary = new FunctionParser(lexer).callExpression(primary);
+			} else if (isToken(".")) {
+				primary = new DotParser(lexer).dotAccessExpression(primary);
 			} else {
 				break;
 			}

@@ -46,7 +46,7 @@ public class BinaryExpr extends ASTList {
 			return computeNumber(op, (int) left, (int) right);
 		} else {
 			throw new StoneException(String.format("cannot compute %s %s %s",
-					left, op, right), this);
+					left.getClass(), op, right.getClass()), this);
 		}
 	}
 
@@ -87,11 +87,18 @@ public class BinaryExpr extends ASTList {
 	}
 
 	private Object computeAssign(Environment env, ASTree lhs, ASTree rhs) {
-		
-		if(!(lhs instanceof Name)){
-			throw new StoneException("left hand side of assign operator must be L-Value but " + lhs, this);
+
+		if (lhs instanceof DotAccessExpr) {
+			return ((DotAccessExpr) lhs).computeAssign(env, rhs);
+
 		}
-		env.put(((Name)lhs).name(), rhs.eval(env));
+
+		if (!(lhs instanceof Name)) {
+			throw new StoneException(
+					"left hand side of assign operator must be L-Value but "
+							+ lhs, this);
+		}
+		env.put(((Name) lhs).name(), rhs.eval(env));
 		return lhs.eval(env);
 	}
 }
