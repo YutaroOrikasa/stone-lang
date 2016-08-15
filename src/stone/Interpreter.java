@@ -27,9 +27,8 @@ public class Interpreter {
 			if (!(t instanceof NullStatement)) {
 				System.out.println(t);
 				eval = t.eval(env);
+				System.out.println("eval: " + eval);
 			}
-
-			System.out.println("eval: " + eval);
 
 		}
 		return eval;
