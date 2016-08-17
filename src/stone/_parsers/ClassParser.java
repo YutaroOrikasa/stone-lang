@@ -33,19 +33,19 @@ public class ClassParser extends Parser {
 
 	private static class ClassStatement extends ASTList {
 
-		private String className;
-		private String superClassName = null;
+		private Name className;
+		private Name superClassName = null;
 		private ASTree classBody;
 
 		public ClassStatement(Name name, Name superName, ASTree body) {
 			this(name, body);
-			superClassName = superName.name();
+			superClassName = superName;
 
 		}
 
 		public ClassStatement(Name name, ASTree body) {
 			super(name, body);
-			className = name.name();
+			className = name;
 			classBody = body;
 
 		}
@@ -54,7 +54,7 @@ public class ClassParser extends Parser {
 		public Object eval(Environment env) {
 			StoneClass cls;
 			if (superClassName != null) {
-				Object superClassObject = env.get(superClassName);
+				Object superClassObject = superClassName.eval(env);
 				if (!(superClassObject instanceof StoneClass)) {
 					throw new StoneException(superClassName
 							+ " is not class name", this);
@@ -65,7 +65,7 @@ public class ClassParser extends Parser {
 				cls = new StoneClass(env, this);
 
 			}
-			env.put(name(), cls);
+			className.computeAssign(env, cls);
 			return cls;
 		}
 
@@ -91,7 +91,7 @@ public class ClassParser extends Parser {
 		}
 
 		private String name() {
-			return className;
+			return className.name();
 		}
 
 	}
