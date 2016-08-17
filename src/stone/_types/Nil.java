@@ -8,4 +8,9 @@ public class Nil {
 
 	private Nil() {
 	}
+
+	@Override
+	public String toString() {
+		return "nil";
+	}
 }

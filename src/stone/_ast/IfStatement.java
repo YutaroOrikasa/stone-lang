@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import stone.Environment;
+import stone._types.Nil;
 import stone._types.Utility;
 import stone.ast.ASTList;
 import stone.ast.ASTree;
@@ -49,11 +50,11 @@ public class IfStatement extends ASTList {
 
 	@Override
 	public Object eval(Environment env) {
-		
+
 		Object condObject = condition().eval(env);
 
 		boolean cond = Utility.convertToStoneBooleanValue(condObject);
-		
+
 		if (cond) {
 			return thenBlock().eval(env);
 
@@ -61,7 +62,7 @@ public class IfStatement extends ASTList {
 			if (elseBlock() != null) {
 				return elseBlock().eval(env);
 			} else {
-				return 0;
+				return Nil.STONE_NIL;
 			}
 		}
 	}
