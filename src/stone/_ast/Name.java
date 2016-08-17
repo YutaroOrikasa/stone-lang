@@ -20,22 +20,26 @@ public class Name extends ASTLeaf {
 
 	@Override
 	public Object eval(Environment env) {
-		
+
 		Object result = env.get(name());
-		
-		if (result==null){
+
+		if (result == null) {
 			throw new StoneNameException(name(), this);
 		}
-		
+
 		return result;
-		 
+
 	}
-	
-	protected static class StoneNameException extends StoneException	{
+
+	public void computeAssign(Environment env, Object value) {
+		env.put(name(), value);
+	}
+
+	protected static class StoneNameException extends StoneException {
 
 		public StoneNameException(String name, ASTree t) {
 			super("name " + name + " is not defined", t);
 		}
-		
+
 	}
 }
