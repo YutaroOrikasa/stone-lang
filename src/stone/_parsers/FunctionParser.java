@@ -59,7 +59,7 @@ public class FunctionParser extends Parser {
 	public ASTree closure() throws ParseException {
 		Token t = eat("fun");
 
-		return new Fun(null, paramList(), block());
+		return new Fun(paramList(), block());
 
 	}
 
@@ -80,11 +80,15 @@ public class FunctionParser extends Parser {
 		public Fun(Name name, ASTree paramater, ASTree body) {
 			super(name, paramater, body);
 
-			if (name != null) {
-				this.name = name.name();
-			} else {
-				this.name = null;
-			}
+			this.name = name.name();
+
+			this.parameters = paramater;
+			this.body = body;
+		}
+
+		public Fun(ASTree paramater, ASTree body) {
+			super(paramater, body);
+			this.name = null;
 
 			this.parameters = paramater;
 			this.body = body;
@@ -256,7 +260,7 @@ public class FunctionParser extends Parser {
 			try {
 				return func.call(args);
 			} catch (Exception e) {
-				throw new StoneException("" + e, this);
+				throw new StoneException(e, this);
 			}
 
 		}
