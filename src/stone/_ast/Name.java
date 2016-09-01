@@ -5,6 +5,9 @@ import stone.StoneException;
 import stone.Token;
 import stone.ast.ASTLeaf;
 import stone.ast.ASTree;
+import stone.llvmbackend.LLVMIRBuilder;
+import stone.llvmbackend.LLVMIRBuilder.NoSuchLocalVariableException;
+import stone.llvmbackend.Value;
 
 /*
  * 変数名等の名前を保持する
@@ -33,6 +36,21 @@ public class Name extends ASTLeaf {
 
 	public void computeAssign(Environment env, Object value) {
 		env.put(name(), value);
+	}
+
+	@Override
+	public Value compileLLVMIR(LLVMIRBuilder builder) {
+		try {
+			return builder.get(name());
+		} catch (NoSuchLocalVariableException e) {
+			throw new StoneNameException(name(), this);
+		}
+	}
+
+	public Value compileLLVMIRAssign(LLVMIRBuilder builder, Value value) {
+
+		return builder.assignLocalVariable(name(), value);
+
 	}
 
 	protected static class StoneNameException extends StoneException {

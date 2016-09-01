@@ -15,6 +15,13 @@ import stone._ast.Name;
 import stone._types.Callable;
 import stone.ast.ASTList;
 import stone.ast.ASTree;
+import stone.llvmbackend.Constant;
+import stone.llvmbackend.GlobalVariable;
+import stone.llvmbackend.Int32Type;
+import stone.llvmbackend.LLVMIRBuilder;
+import stone.llvmbackend.Register;
+import stone.llvmbackend.Type;
+import stone.llvmbackend.Value;
 
 public class FunctionParser extends Parser {
 	Lexer lexer;
@@ -132,6 +139,34 @@ public class FunctionParser extends Parser {
 
 		public int numOfParameters() {
 			return parameters().numChildren();
+		}
+
+		@Override
+		public Value compileLLVMIR(LLVMIRBuilder builder) {
+
+			Int32Type i32 = new Int32Type();
+
+			Type[] argTypes = new Type[numOfParameters()];
+
+			for (int i = 0; i < argTypes.length; i++) {
+				argTypes[i] = i32;
+			}
+
+			Register[] args = builder.defineFunction(i32, name, argTypes);
+
+			for (int i = 0; i < parameters().numChildren(); i++) {
+
+				String name = ((Name) parameters().child(i)).name();
+				((Name) parameters().child(i)).compileLLVMIRAssign(builder,
+						args[i]);
+
+			}
+
+			builder.ret(body().compileLLVMIR(builder));
+
+			builder.endFunction();
+
+			return new Constant(0);
 		}
 	}
 
@@ -264,6 +299,21 @@ public class FunctionParser extends Parser {
 			}
 
 		}
+
+		@Override
+		public Value compileLLVMIR(LLVMIRBuilder builder) {
+			Name funcName = (Name) child(0);
+			Value funcSymbol = new GlobalVariable(funcName.name());
+
+			Value[] args = new Value[args().numChildren()];
+
+			for (int i = 0; i < args.length; i++) {
+				args[i] = args().child(i).compileLLVMIR(builder);
+			}
+
+			return builder.call(funcSymbol, args);
+
+		}
 	}
 
 	/*
@@ -293,6 +343,12 @@ public class FunctionParser extends Parser {
 		public Object eval(Environment env) {
 			throw new RuntimeException(
 					"this node cannot be evaluated! never call eval()!");
+		}
+
+		@Override
+		public Value compileLLVMIR(LLVMIRBuilder builder) {
+			throw new RuntimeException(
+					"this node cannot be comliped! never call me!");
 		}
 
 	}

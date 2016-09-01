@@ -19,6 +19,8 @@ import stone._ast.WhileStatement;
 import stone._parsers.FunctionParser;
 import stone.ast.ASTLeaf;
 import stone.ast.ASTree;
+import stone.llvmbackend.LLVMIRBuilder;
+import stone.llvmbackend.Value;
 
 public class Parser {
 	private static HashMap<String, Integer> operatorPriorityTable = new HashMap<>();
@@ -77,6 +79,12 @@ public class Parser {
 		@Override
 		public Object eval(Environment env) {
 			return null;
+		}
+
+		@Override
+		public Value compileLLVMIR(LLVMIRBuilder builder) {
+			throw new RuntimeException(
+					"this node cannot be comliped! never call me!");
 		}
 
 	}
@@ -375,6 +383,12 @@ public class Parser {
 		public Object eval(Environment env) {
 			throw new RuntimeException(
 					"this node cannot be evaluated! never call eval()!");
+		}
+
+		@Override
+		public Value compileLLVMIR(LLVMIRBuilder builder) {
+			throw new RuntimeException(
+					"this node cannot be comliped! never call me!");
 		}
 
 	}

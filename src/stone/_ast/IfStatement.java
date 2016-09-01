@@ -8,6 +8,11 @@ import stone._types.Nil;
 import stone._types.Utility;
 import stone.ast.ASTList;
 import stone.ast.ASTree;
+import stone.llvmbackend.Constant;
+import stone.llvmbackend.LLVMIRBuilder;
+import stone.llvmbackend.LLVMIRBuilder.NoSuchLocalVariableException;
+import stone.llvmbackend.Label;
+import stone.llvmbackend.Value;
 
 public class IfStatement extends ASTList {
 	public IfStatement(List<ASTree> list) {
@@ -65,5 +70,41 @@ public class IfStatement extends ASTList {
 				return Nil.STONE_NIL;
 			}
 		}
+	}
+
+	@Override
+	public Value compileLLVMIR(LLVMIRBuilder builder) {
+
+		Value cond = condition().compileLLVMIR(builder);
+
+		Label thenLabel = builder.genTmpLabel();
+		Label elseLable = builder.genTmpLabel();
+		Label endifLabel = builder.genTmpLabel();
+
+		builder.branch(cond, thenLabel, elseLable);
+
+		builder.enter(thenLabel);
+		builder.assignLocalVariable(".ifStatementLastEvaluated", thenBlock()
+				.compileLLVMIR(builder));
+		builder.branch(endifLabel);
+
+		builder.enter(elseLable);
+		if (elseBlock() != null) {
+			builder.assignLocalVariable(".ifStatementLastEvaluated",
+					elseBlock().compileLLVMIR(builder));
+		} else {
+			builder.assignLocalVariable(".ifStatementLastEvaluated",
+					new Constant(0));
+		}
+		builder.branch(endifLabel);
+
+		builder.enter(endifLabel);
+
+		try {
+			return builder.get(".ifStatementLastEvaluated");
+		} catch (NoSuchLocalVariableException e) {
+			throw new RuntimeException("fatal", e);
+		}
+
 	}
 }
