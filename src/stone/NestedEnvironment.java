@@ -1,9 +1,6 @@
-package stone._parsers;
+package stone;
 
-import stone.BasicEnvironment;
-import stone.Environment;
-
-class NestedEnvironment implements Environment {
+public class NestedEnvironment implements Environment {
 
 	Environment outerEnv;
 	Environment innerEnv;
