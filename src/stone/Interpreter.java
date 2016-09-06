@@ -1,6 +1,7 @@
 package stone;
 
 import java.io.Reader;
+import java.io.StringReader;
 
 import stone.Parser.NullStatement;
 import stone.ast.ASTree;
@@ -31,6 +32,18 @@ public class Interpreter {
 			}
 
 		}
+
+		try {
+			ASTree t = new Parser(new Lexer(new StringReader("main"))).program();
+			eval = t.eval(env);
+		} catch (StoneException e) {
+			System.out.println("interpreter: no main function found. exit.");
+			return eval;
+		}
+
+		ASTree t = new Parser(new Lexer(new StringReader("main()"))).program();
+		eval = t.eval(env);
+		System.out.println("eval: " + eval);
 		return eval;
 	}
 
