@@ -3,6 +3,7 @@ package stone._parsers;
 import stone.BasicEnvironment;
 import stone.Environment;
 import stone.Lexer;
+import stone.NestedEnvironment;
 import stone.ParseException;
 import stone.Parser;
 import stone.StoneException;
@@ -56,8 +57,7 @@ public class ClassParser extends Parser {
 			if (superClassName != null) {
 				Object superClassObject = superClassName.eval(env);
 				if (!(superClassObject instanceof StoneClass)) {
-					throw new StoneException(superClassName
-							+ " is not class name", this);
+					throw new StoneException(superClassName + " is not class name", this);
 				}
 
 				cls = new StoneClass(env, this, (StoneClass) superClassObject);
@@ -72,15 +72,13 @@ public class ClassParser extends Parser {
 		@Override
 		public String toString() {
 			if (superClassName != null) {
-				return "(class " + className + " extends " + superClassName
-						+ " " + classBody + ")";
+				return "(class " + className + " extends " + superClassName + " " + classBody + ")";
 			} else {
 				return "(class " + className + " " + classBody + ")";
 			}
 		}
 
-		public Environment initializeFields(Environment env,
-				StoneClass superClass, Environment outer) {
+		public Environment initializeFields(Environment env, StoneClass superClass, Environment outer) {
 			if (superClass != null) {
 				superClass.initializeFields(env);
 			}
@@ -108,8 +106,7 @@ public class ClassParser extends Parser {
 			setField("new", new Constructor());
 		}
 
-		public StoneClass(Environment env, ClassStatement def,
-				StoneClass superClass) {
+		public StoneClass(Environment env, ClassStatement def, StoneClass superClass) {
 			this(env, def);
 			this.superClass = superClass;
 		}
